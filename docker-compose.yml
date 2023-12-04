@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  db_mongo:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    environment: 
+      MONGO_INITDB_ROOT_USERNAME: thallesncarvalho
+      MONGO_INITDB_ROOT_PASSWORD: thallesncarvalho
+    ports: 
+      - 27017:27017
+  db_postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: metabase
+      POSTGRES_USER: thallesncarvalho
+      POSTGRES_PASSWORD: thallesncarvalho
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    restart: always
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: thallesncarvalho
+      MB_DB_PASS: thallesncarvalho
+      MB_DB_HOST: db_postgres
+    depends_on:
+      - db_postgres
+    volumes:
+      - .:/metabase
+    ports:
+      - 3000:3000
+  app:
+    build: .
+    ports:
+      - 3030:3030
+    depends_on:
+      - db_mongo
